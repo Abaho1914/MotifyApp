@@ -1,4 +1,4 @@
-package com.abahoabbott.motify.notif
+package com.abahoabbott.motify.notify
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -6,10 +6,8 @@ import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
 import com.abahoabbott.motify.MainActivity
 import com.abahoabbott.motify.R
 import kotlinx.coroutines.Dispatchers

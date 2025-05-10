@@ -1,12 +1,11 @@
 package com.abahoabbott.motify
 
 import android.app.Application
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
-import com.abahoabbott.motify.notif.CHANNEL_DESCRIPTION
-import com.abahoabbott.motify.notif.CHANNEL_ID
-import com.abahoabbott.motify.notif.CHANNEL_NAME
-import com.abahoabbott.motify.notif.createNotificationChannelIfNeeded
+import com.abahoabbott.motify.notify.CHANNEL_DESCRIPTION
+import com.abahoabbott.motify.notify.CHANNEL_ID
+import com.abahoabbott.motify.notify.CHANNEL_NAME
+import com.abahoabbott.motify.notify.createNotificationChannelIfNeeded
 import dagger.hilt.android.HiltAndroidApp
 
 
