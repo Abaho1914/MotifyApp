@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.androidTestImplementation
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -70,5 +72,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
+
+    androidTestImplementation (libs.androidx.work.testing)
 
 }

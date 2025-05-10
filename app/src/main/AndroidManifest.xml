@@ -16,11 +16,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Motify"
         tools:targetApi="31">
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.Motify">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
