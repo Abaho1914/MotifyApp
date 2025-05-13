@@ -2,6 +2,7 @@ package com.abahoabbott.motify.di
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.WorkManager
 import com.abahoabbott.motify.notify.NotificationManagerHelper
 import dagger.Module
 import dagger.Provides
@@ -26,6 +27,15 @@ object WorkerModule {
         @ApplicationContext ctx: Context
     ): NotificationManagerCompat =
         NotificationManagerCompat.from(ctx)
+
+    /**
+     * Provides the WorkManager instance
+     */
+    @Singleton
+    @Provides
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager {
+        return WorkManager.getInstance(context)
+    }
 
 }
 

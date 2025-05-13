@@ -12,7 +12,15 @@ import com.abahoabbott.motify.notify.NotificationManagerHelper
 import com.abahoabbott.motify.notify.createNotificationChannelIfNeeded
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import timber.log.Timber
 
+
+/**
+ * A worker that sends a daily motivational quote as a notification.
+ *
+ * Uses [NotificationManagerHelper] to show the notification, and ensures
+ * the required notification channel is created before sending.
+ */
 @HiltWorker
 class MotifyWorker @AssistedInject constructor(
     @Assisted context: Context,
@@ -21,6 +29,12 @@ class MotifyWorker @AssistedInject constructor(
     private val notificationManagerHelper: NotificationManagerHelper,
 ): CoroutineWorker(context,params){
 
+
+    /**
+     * Ensures the notification channel exists and fires a motivational notification.
+     *
+     * @return [Result.success] if successful, or [Result.retry] on failure.
+     */
     override suspend fun doWork(): Result {
         return try {
             //Ensure channel exists
@@ -39,6 +53,7 @@ class MotifyWorker @AssistedInject constructor(
 
             Result.success()
         } catch (e: Exception) {
+            Timber.e(e, "Failed to send motivation notification")
             Result.retry()
         }
 
