@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -83,7 +84,7 @@ fun MotivationScreen(
 
     // UI State
     var isQuoteVisible by remember { mutableStateOf(true) }
-    val currentQuote = viewModel.currentQuote
+    val currentQuote by viewModel.currentQuote.collectAsState()
 
     Box(
         modifier = modifier
@@ -147,7 +148,7 @@ fun MotivationScreen(
                         scope.launch {
                             notificationManager.showMotivationNotification(
                                 "Daily Motivation",
-                                currentQuote
+                                quote = currentQuote
                             )
                         }
                     },

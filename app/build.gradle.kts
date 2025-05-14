@@ -86,5 +86,6 @@ dependencies {
 
     androidTestImplementation(libs.androidx.work.testing)
     implementation(libs.timber)
+    testImplementation(kotlin("test"))
 
 }

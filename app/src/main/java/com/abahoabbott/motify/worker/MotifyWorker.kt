@@ -5,11 +5,13 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.abahoabbott.motify.motivate.QuotesRepository
 import com.abahoabbott.motify.notify.CHANNEL_DESCRIPTION
 import com.abahoabbott.motify.notify.CHANNEL_ID
 import com.abahoabbott.motify.notify.CHANNEL_NAME
 import com.abahoabbott.motify.notify.NotificationManagerHelper
 import com.abahoabbott.motify.notify.createNotificationChannelIfNeeded
+import com.abahoabbott.motify.qoutes.QuoteProvider
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber
@@ -27,7 +29,9 @@ class MotifyWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val notificationManagerHelper: NotificationManagerHelper,
-): CoroutineWorker(context,params){
+    private val quoteProvider: QuoteProvider,
+    private val quotesRepository: QuotesRepository
+) : CoroutineWorker(context, params) {
 
 
     /**
@@ -38,13 +42,18 @@ class MotifyWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         return try {
             //Ensure channel exists
-          notificationManagerCompat.createNotificationChannelIfNeeded(
-              CHANNEL_ID,
-              CHANNEL_NAME,
-              CHANNEL_DESCRIPTION
-          )
+            Timber.d("Creating notification channel")
+
+            notificationManagerCompat.createNotificationChannelIfNeeded(
+                CHANNEL_ID,
+                CHANNEL_NAME,
+                CHANNEL_DESCRIPTION
+            )
             //Get next quote
-           val quote = "Fresh out of slumber"
+            val quote = quoteProvider.getDailyQuote()
+
+            quotesRepository.setLatestQuote(quote)
+
             //Fire notification
             notificationManagerHelper.showMotivationNotification(
                 "Your Daily Motivation",

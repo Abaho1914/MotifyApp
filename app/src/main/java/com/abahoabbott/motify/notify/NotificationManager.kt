@@ -26,40 +26,46 @@ class NotificationManagerHelper(private val context: Context) {
     /**
      * Shows a motivation notification with the given title and message
      */
-    suspend fun showMotivationNotification(title: String, message: String): Result<Int> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val notificationId = System.currentTimeMillis().toInt()
-                val notificationManager = NotificationManagerCompat.from(context)
+    suspend fun showMotivationNotification(
+        title: String,
+        quote: String
+    ): Result<Int> = withContext(Dispatchers.IO)
+    {
+        try {
+            val notificationId = System.currentTimeMillis().toInt()
+            val notificationManager = NotificationManagerCompat.from(context)
 
-                val pendingIntent = createMainActivityPendingIntent()
+            //Create a Pending Intent that carries the quote extras
+            val pendingIntent = createMainActivityPendingIntent(quote)
 
-                val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setContentTitle(title)
-                    .setContentText(message)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setContentIntent(pendingIntent)
-                    .setAutoCancel(true)
-                    .build()
+            val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(title)
+                .setContentText(quote)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(quote))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .build()
 
-                notificationManager.notify(notificationId, notification)
-                Result.success(notificationId)
-            } catch (e: SecurityException) {
-                // Handle missing notification permission
-                Result.failure(e)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+            notificationManager.notify(notificationId, notification)
+            Result.success(notificationId)
+        } catch (e: SecurityException) {
+            // Handle missing notification permission
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
+
 
     /**
      * Creates a PendingIntent that opens MainActivity
      */
-    private fun createMainActivityPendingIntent(): PendingIntent {
+    private fun createMainActivityPendingIntent(quote: String): PendingIntent {
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("quote", quote)
         }
 
         return TaskStackBuilder.create(context).run {
@@ -69,9 +75,11 @@ class NotificationManagerHelper(private val context: Context) {
             val flags =
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
 
-            getPendingIntent(0, flags) ?: throw IllegalStateException("Failed to create PendingIntent")
+            getPendingIntent(0, flags)
+                ?: throw IllegalStateException("Failed to create PendingIntent")
         }
     }
+
 }
 
 /**

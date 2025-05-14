@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import com.abahoabbott.motify.notify.NotificationManagerHelper
+import com.abahoabbott.motify.qoutes.DefaultMotifyQuoteProvider
+import com.abahoabbott.motify.qoutes.QuoteProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,6 +37,12 @@ object WorkerModule {
     @Provides
     fun provideWorkManager(@ApplicationContext context: Context): WorkManager {
         return WorkManager.getInstance(context)
+    }
+
+    @Singleton
+    @Provides
+    fun provideQuoteProvider(): QuoteProvider {
+        return DefaultMotifyQuoteProvider()
     }
 
 }
