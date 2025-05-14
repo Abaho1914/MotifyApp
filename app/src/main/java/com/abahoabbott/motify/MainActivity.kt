@@ -17,6 +17,10 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val quote = intent.getStringExtra("QUOTE_FROM_NOTIFICATION")
+        quote?.let {
+            (application as MotifyHiltApp).latestLaunchedQuote = it
+        }
         enableEdgeToEdge()
           setContent {
             MotifyTheme {

@@ -48,6 +48,18 @@ import com.abahoabbott.motify.ui.theme.MotifyTheme
 import kotlinx.coroutines.launch
 
 
+/**
+ * MotivationScreen displays and manages inspirational quotes.
+ *
+ * Features:
+ * - Displays motivational quotes with fade-in animation
+ * - Allows users to request a new quote
+ * - Allows users to set reminders via notifications
+ * - Handles notification permission requests for Android 13+ (Tiramisu)
+ *
+ * @param modifier Modifier to be applied to the screen
+ * @param viewModel ViewModel containing quote logic and state
+ */
 @Composable
 fun MotivationScreen(
     modifier: Modifier = Modifier,

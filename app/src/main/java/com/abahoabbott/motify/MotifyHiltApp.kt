@@ -23,6 +23,11 @@ class MotifyHiltApp : Application(), Configuration.Provider {
     @Inject
     lateinit var workSchedulerManager: WorkSchedulerManager
 
+    var latestLaunchedQuote: String? = null
+
+    var requestNotificationPermission: Boolean = false
+
+
     /** Build WorkManager config to use Hilt’s WorkerFactory */
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()

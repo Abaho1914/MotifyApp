@@ -50,5 +50,11 @@ class MotifyViewModel @Inject constructor(
         _currentQuote.value = motivationQuotes[nextIndex]
         Timber.i("Next quote: ${_currentQuote.value}")
     }
+
+    fun overrideQuoteFromNotification(quote: String) {
+        _currentQuote.value = quote
+        Timber.i("Quote overridden from notification: $quote")
+    }
+
 }
 
