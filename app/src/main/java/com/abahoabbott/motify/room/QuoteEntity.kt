@@ -9,6 +9,6 @@ data class QuoteEntity(
     val date: String, //Format ,YYYY-MM-DD
     val text: String,
     val author: String,
-    val isBookmarked: String
+    val isBookmarked: Boolean = false
 )
 

@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.abahoabbott.motify.data.Quote
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -20,6 +22,12 @@ class MotifyViewModel @Inject constructor(
 
     private val _currentQuote = MutableStateFlow(Quote("", ""))
     val currentQuote: StateFlow<Quote> = _currentQuote
+
+    val todayQuote: StateFlow<Quote?> = quotesRepository.getTodayQuote().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 
     init {
         // Show latest from worker, or fallback to list
