@@ -14,6 +14,11 @@ import javax.inject.Inject
  */
 class QuotesRepository @Inject constructor() {
 
+     val motivationQuotes = listOf(
+        Quote("Believe you can and you're halfway there.", "Theodore Roosevelt"),
+        Quote("The only way to do great work is to love what you do.", "Steve Jobs"),
+    )
+
     // A private StateFlow to hold the latest quote, allowing read-write operations internally.
     private val _latestQuote = MutableStateFlow<Quote?>(null)
 

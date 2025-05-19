@@ -15,19 +15,8 @@ import javax.inject.Inject
 class MotifyViewModel @Inject constructor(
     private val quotesRepository: QuotesRepository
 ) : ViewModel() {
-    private val motivationQuotes = listOf(
-        Quote("The biggest temptation is to settle for too little.", "Unknown"),
-        Quote("Your only limit is your mind.", "Unknown"),
-        Quote(
-            "Success is not final, failure is not fatal: It is the courage to continue that counts.",
-            "Unknown"
-        ),
-        Quote("It always seems impossible until it's done.", "Unknown"),
-        Quote(
-            "The future belongs to those who believe in the beauty of their dreams.",
-            "Eleanor Roosevelt"
-        ) // Known author
-    )
+
+    private val motivationQuotes = quotesRepository.motivationQuotes
 
     private val _currentQuote = MutableStateFlow(Quote("", ""))
     val currentQuote: StateFlow<Quote> = _currentQuote
