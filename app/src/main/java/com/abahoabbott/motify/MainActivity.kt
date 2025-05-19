@@ -7,8 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import com.abahoabbott.motify.motivate.MotivationScreen
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.abahoabbott.motify.motivate.MotifyScreen
+import com.abahoabbott.motify.motivate.MotifyViewModel
 import com.abahoabbott.motify.ui.theme.MotifyTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,19 +20,28 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val quote = intent.getStringExtra("QUOTE_FROM_NOTIFICATION")
-        quote?.let {
-            (application as MotifyHiltApp).latestLaunchedQuote = it
-        }
+
+
+        val quoteFromNotification = intent?.getStringExtra("QUOTE_FROM_NOTIFICATION")
+
+
         enableEdgeToEdge()
           setContent {
+              val viewModel: MotifyViewModel = hiltViewModel()
+              // Override quote if launched from notification
+              LaunchedEffect(quoteFromNotification) {
+                  quoteFromNotification?.let {
+                      viewModel.overrideQuoteFromNotification(it)
+                  }
+              }
             MotifyTheme {
+
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MotivationScreen()
+                    MotifyScreen()
                 }
             }
         }

@@ -1,16 +1,22 @@
 package com.abahoabbott.motify.motivate
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
@@ -20,45 +26,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.abahoabbott.motify.ui.theme.MotifyTheme
 
-/**
- * Displays a motivational quote with a fade-in animation.
- *
- * @param quote The motivational quote to display
- * @param isVisible Controls the visibility of the quote
- * @param modifier Optional modifier for the card
- */
-@Composable
-fun QuoteCard(
-    quote: String,
-    isVisible: Boolean,
-    modifier: Modifier = Modifier
-) {
-    AnimatedVisibility(
-        visible = isVisible,
-        enter = fadeIn(animationSpec = tween(durationMillis = 500))
-    ) {
-        ElevatedCard(
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-            shape = RoundedCornerShape(16.dp),
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = quote,
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-    }
-}
 
 /** Row of buttons for user actions.
  *
@@ -81,7 +53,8 @@ fun ActionButtons(
         // Next quote button
         Button(
             onClick = onNewQuote,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            shape = MaterialTheme.shapes.medium
         ) {
             Text("New Quote")
         }
@@ -90,7 +63,8 @@ fun ActionButtons(
         OutlinedButton(
             onClick = onSendReminder,
             modifier = Modifier.weight(1f),
-            enabled = isNotificationEnabled
+            enabled = isNotificationEnabled,
+            shape = MaterialTheme.shapes.medium
         ) {
             Text("Remind Me")
         }
@@ -129,15 +103,87 @@ fun NotificationPermissionPrompt(
     }
 }
 
+@Composable
+fun MoodSelector(
+    selectedMood: String?,
+    onMoodSelected: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val moods = listOf("😊 Happy", "😐 Okay", "😢 Sad", "😡 Angry", "😴 Tired")
+
+    Column(modifier = modifier.padding(horizontal = 16.dp)) {
+        Text(
+            text = "How are you feeling today?",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(moods) { mood ->
+                FilterChip(
+                    selected = selectedMood == mood,
+                    onClick = { onMoodSelected(mood) },
+                    label = { Text(mood) },
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeActionsRow(
+    onNavigateToSaved: () -> Unit,
+    onNavigateToGoals: () -> Unit,
+    onNavigateToReminders: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 24.dp)
+    ) {
+        ActionButton(icon = Icons.Filled.Favorite, label = "Saved", onClick = onNavigateToSaved)
+        ActionButton(icon = Icons.Filled.CheckCircle, label = "Goals", onClick = onNavigateToGoals)
+        ActionButton(icon = Icons.Filled.Notifications, label = "Reminders", onClick = onNavigateToReminders)
+    }
+}
+
+@Composable
+fun ActionButton(
+    icon: ImageVector,
+    label: String,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable(onClick = onClick)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            modifier = Modifier.size(32.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+
 
 @Composable
 @PreviewLightDark
-private fun QuoteCardPreview() {
+private fun MoodsSelectorPreview() {
     MotifyTheme {
         Surface {
-            QuoteCard(
-                quote = "Dread it,Run from it, Destiny arrives all the same",
-                isVisible = true
+            MoodSelector(
+                selectedMood = "😊 Happy",
+                onMoodSelected = {}
             )
         }
     }

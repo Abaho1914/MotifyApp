@@ -57,7 +57,7 @@ class MotifyWorker @AssistedInject constructor(
             //Fire notification
             notificationManagerHelper.showMotivationNotification(
                 "Your Daily Motivation",
-                quote
+                quote.toString()
             )
 
             Result.success()
