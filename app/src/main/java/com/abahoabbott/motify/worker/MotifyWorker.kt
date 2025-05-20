@@ -52,7 +52,7 @@ class MotifyWorker @AssistedInject constructor(
             //Get next quote
             val quote = quoteProvider.getDailyQuote()
 
-            quotesRepository.setLatestQuote(quote)
+            quotesRepository.saveQuoteOfTheDay(quote)
 
             //Fire notification
             notificationManagerHelper.showMotivationNotification(

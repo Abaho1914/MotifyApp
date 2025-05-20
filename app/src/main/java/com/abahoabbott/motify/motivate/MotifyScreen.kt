@@ -30,6 +30,9 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.abahoabbott.motify.data.Quote
 import com.abahoabbott.motify.notify.NotificationManagerHelper
+import com.abahoabbott.motify.screens.home.ErrorScreen
+import com.abahoabbott.motify.screens.home.LoadingScreen
+import com.abahoabbott.motify.screens.home.MotifyUiState
 import com.abahoabbott.motify.screens.home.QuoteOfTheDayCardNew
 import com.abahoabbott.motify.ui.theme.MotifyTheme
 import kotlinx.coroutines.delay
@@ -41,14 +44,25 @@ fun MotifyScreen(
     viewModel: MotifyViewModel = hiltViewModel()
 ) {
 
-    val quote = viewModel.currentQuote.collectAsState().value
+   val uiState =  viewModel.uiState.collectAsState().value
+
+    when (uiState) {
+        is MotifyUiState.Error -> ErrorScreen(
+            errorMessage = uiState.message,
+            modifier = modifier
+        )
+
+        MotifyUiState.Loading -> LoadingScreen(
+            modifier = modifier
+        )
+
+        is MotifyUiState.Success -> MotifyScreenContents(
+            modifier = modifier,
+            currentQuote = uiState.quote
+        )
+    }
 
 
-    MotifyScreenContents(
-        modifier = modifier,
-        currentQuote = quote,
-        getNeteQuote = viewModel::getNextQuote,
-    )
 }
 
 

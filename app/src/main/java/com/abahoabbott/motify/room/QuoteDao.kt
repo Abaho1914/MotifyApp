@@ -12,12 +12,13 @@ interface QuoteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertQuote(quote: QuoteEntity)
 
-    @Query("SELECT * FROM QuotesTable WHERE date = :date LIMIT 1")
+    @Query("SELECT * FROM QuotesTable WHERE timestamp LIKE :date || '%' LIMIT 1")
     fun getQuoteByDate(date: String): Flow<QuoteEntity?>
 
-    @Query("SELECT * FROM QuotesTable ORDER BY date DESC LIMIT 1")
+
+    @Query("SELECT * FROM QuotesTable ORDER BY timestamp DESC LIMIT 1")
     fun getLatestQuote(): Flow<QuoteEntity?>
 
-    @Query("SELECT * FROM QuotesTable ORDER BY date DESC")
+    @Query("SELECT * FROM QuotesTable ORDER BY timestamp DESC")
     fun getAllQuotes(): Flow<List<QuoteEntity>>
 }

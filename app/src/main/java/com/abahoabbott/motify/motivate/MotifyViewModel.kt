@@ -3,11 +3,12 @@ package com.abahoabbott.motify.motivate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abahoabbott.motify.data.Quote
+import com.abahoabbott.motify.screens.home.MotifyUiState
+import com.abahoabbott.motify.screens.home.MotifyUiState.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -18,42 +19,45 @@ class MotifyViewModel @Inject constructor(
     private val quotesRepository: QuotesRepository
 ) : ViewModel() {
 
-    private val motivationQuotes = quotesRepository.motivationQuotes
+    private val _uiState = MutableStateFlow<MotifyUiState>(Loading)
+    val uiState: StateFlow<MotifyUiState> = _uiState.asStateFlow()
 
-    private val _currentQuote = MutableStateFlow(Quote("", ""))
-    val currentQuote: StateFlow<Quote> = _currentQuote
-
-    val todayQuote: StateFlow<Quote?> = quotesRepository.getTodayQuote().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
 
     init {
-        // Show latest from worker, or fallback to list
+        fetchInitialQuote()
+    }
+
+    private fun fetchInitialQuote() {
 
         viewModelScope.launch {
-            quotesRepository.latestQuote.collect { quote ->
-                if (quote != null) {
-                    _currentQuote.value = quote
-                } else {
-                    _currentQuote.value = motivationQuotes[0]
+            _uiState.value = Loading
+            try {
+                quotesRepository.getTodayQuote().collect {
+
+                    quote->
+                    if (quote == null){
+                        _uiState.value = Error("No quote")
+                    } else
+                    {
+                        _uiState.value = Success(quote)
+                    }
                 }
+
+            } catch (e: Exception){
+                _uiState.value = Error(e.message.toString())
             }
+
         }
 
     }
 
     // Function to get the next quote
     fun getNextQuote() {
-        val currentIndex = motivationQuotes.indexOf(_currentQuote.value)
-        val nextIndex = (currentIndex + 1) % motivationQuotes.size
-        _currentQuote.value = motivationQuotes[nextIndex]
-        Timber.i("Next quote: ${_currentQuote.value}")
-    }
+
+       }
 
     fun overrideQuoteFromNotification(quote: String) {
-        _currentQuote.value = stringToQuote(quote)
+        _uiState.value = Success( stringToQuote(quote))
         Timber.i("Quote overridden from notification: $quote")
     }
 
