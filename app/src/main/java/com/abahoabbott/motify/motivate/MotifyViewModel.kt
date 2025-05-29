@@ -36,7 +36,7 @@ class MotifyViewModel @Inject constructor(
 
                     quote->
                     if (quote == null){
-                        _uiState.value = Error("No quote")
+                        _uiState.value = Error("No quote found")
                     } else
                     {
                         _uiState.value = Success(quote)
@@ -59,6 +59,22 @@ class MotifyViewModel @Inject constructor(
     fun overrideQuoteFromNotification(quote: String) {
         _uiState.value = Success( stringToQuote(quote))
         Timber.i("Quote overridden from notification: $quote")
+    }
+
+    fun toggleFavorite(quote: Quote){
+        viewModelScope.launch {
+            try {
+                val updatedQuote = quote.copy(
+                    isSaved = !quote.isSaved
+                )
+                quotesRepository.updateQuote(updatedQuote)
+              if (_uiState.value is Success && (uiState.value as Success).quote == quote){
+                  _uiState.value = Success(updatedQuote)
+              }
+            } catch (e:Exception){
+                Timber.e(e, "Error toggling favorite state for quote: ${quote.text}")
+            }
+        }
     }
 
     fun stringToQuote(quoteString: String): Quote {

@@ -1,32 +1,33 @@
 package com.abahoabbott.motify.motivate
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.abahoabbott.motify.ui.theme.MotifyTheme
@@ -79,26 +80,72 @@ fun ActionButtons(
  */
 @Composable
 fun NotificationPermissionPrompt(
+    modifier: Modifier = Modifier,
     onRequestPermission: () -> Unit,
-    modifier: Modifier = Modifier
+    onDismiss: (() -> Unit)? = null,
 ) {
-    OutlinedCard(
+    Card(
         colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f)
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(
+                alpha = 0.5f
+            ),
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
         ),
-        modifier = modifier.padding(horizontal = 16.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = MaterialTheme.shapes.large,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Text(
-            "Notification permission is required for reminders",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(16.dp),
-            color = MaterialTheme.colorScheme.onErrorContainer
-        )
-        TextButton(
-            onClick = onRequestPermission,
-            modifier = Modifier.align(Alignment.End)
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            Text("Grant Permission")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                            CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = "Notification Icon",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = "Stay on Track with Reminders",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "To send you motivational quotes, Motify needs permission to show notifications.",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = if (onDismiss != null) Arrangement.End else Arrangement.Center // Center if only one button
+            ) {
+                if (onDismiss != null) {
+                    TextButton(onClick = onDismiss) {
+                        Text("Maybe Later")
+                    }
+                    Spacer(modifier = Modifier.size(8.dp))
+                }
+                Button( // Use a filled Button for the primary action for more emphasis
+                    onClick = onRequestPermission,
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Text("Turn On Notifications")
+                }
+            }
         }
     }
 }
@@ -130,50 +177,6 @@ fun MoodSelector(
         }
     }
 }
-
-@Composable
-fun HomeActionsRow(
-    onNavigateToSaved: () -> Unit,
-    onNavigateToGoals: () -> Unit,
-    onNavigateToReminders: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 24.dp)
-    ) {
-        ActionButton(icon = Icons.Filled.Favorite, label = "Saved", onClick = onNavigateToSaved)
-        ActionButton(icon = Icons.Filled.CheckCircle, label = "Goals", onClick = onNavigateToGoals)
-        ActionButton(icon = Icons.Filled.Notifications, label = "Reminders", onClick = onNavigateToReminders)
-    }
-}
-
-@Composable
-fun ActionButton(
-    icon: ImageVector,
-    label: String,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(onClick = onClick)
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            modifier = Modifier.size(32.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
 
 
 @Composable

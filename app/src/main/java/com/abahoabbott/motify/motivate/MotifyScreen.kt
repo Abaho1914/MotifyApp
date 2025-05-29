@@ -33,7 +33,7 @@ import com.abahoabbott.motify.notify.NotificationManagerHelper
 import com.abahoabbott.motify.screens.home.ErrorScreen
 import com.abahoabbott.motify.screens.home.LoadingScreen
 import com.abahoabbott.motify.screens.home.MotifyUiState
-import com.abahoabbott.motify.screens.home.QuoteOfTheDayCardNew
+import com.abahoabbott.motify.screens.home.QuoteOfTheDayCard
 import com.abahoabbott.motify.ui.theme.MotifyTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -58,7 +58,9 @@ fun MotifyScreen(
 
         is MotifyUiState.Success -> MotifyScreenContents(
             modifier = modifier,
-            currentQuote = uiState.quote
+            currentQuote = uiState.quote,
+            onSaveQuote ={viewModel.toggleFavorite(it)}
+
         )
     }
 
@@ -70,7 +72,9 @@ fun MotifyScreen(
 private fun MotifyScreenContents(
     currentQuote: Quote,
     modifier: Modifier = Modifier,
-    getNeteQuote: () -> Unit = {},
+    getNewQuote: () -> Unit = {},
+    onShareClick: () -> Unit = {},
+    onSaveQuote:(quote:Quote)  -> Unit ={}
 ) {
 
     val context = LocalContext.current
@@ -103,9 +107,9 @@ private fun MotifyScreenContents(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
         ) {
-            QuoteOfTheDayCardNew(
+            QuoteOfTheDayCard(
                 quote = currentQuote,
-                onSaveClick = {},
+                onSaveClick = {onSaveQuote(it)},
                 onShareClick = {}
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -116,7 +120,7 @@ private fun MotifyScreenContents(
                     handleNewQuoteRequest(
                         scope = scope,
                         updateVisibility = {},
-                        getNextQuote = getNeteQuote
+                        getNextQuote = getNewQuote
                     )
                 },
                 onSendReminder = {
@@ -131,14 +135,7 @@ private fun MotifyScreenContents(
 
         }
         // Show permission request notice if needed
-        if (!hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Spacer(modifier = Modifier.height(16.dp))
-            NotificationPermissionPrompt(
-                onRequestPermission = {
-                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                }
-            )
-        }
+
 
     }
 }

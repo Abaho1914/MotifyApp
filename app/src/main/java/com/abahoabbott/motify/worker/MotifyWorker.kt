@@ -15,6 +15,7 @@ import com.abahoabbott.motify.qoutes.QuoteProvider
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber
+import java.time.LocalDate
 
 
 /**
@@ -50,7 +51,7 @@ class MotifyWorker @AssistedInject constructor(
                 CHANNEL_DESCRIPTION
             )
             //Get next quote
-            val quote = quoteProvider.getDailyQuote()
+            val quote = quoteProvider.getDailyQuote(LocalDate.now())
 
             quotesRepository.saveQuoteOfTheDay(quote)
 

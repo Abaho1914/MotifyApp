@@ -51,9 +51,9 @@ import com.abahoabbott.motify.ui.theme.MotifyTheme
  *  */
 
 @Composable
-fun QuoteOfTheDayCardNew(
+fun QuoteOfTheDayCard(
     quote: Quote,
-    onSaveClick: () -> Unit,
+    onSaveClick: (quote: Quote) -> Unit,
     onShareClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -126,10 +126,12 @@ fun QuoteOfTheDayCardNew(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = onSaveClick) {
+                        IconButton(onClick = { onSaveClick(quote) }) {
                             Icon(
-                                painter = painterResource(id = R.drawable.baseline_bookmark_border_24),
-                                contentDescription = "Favorite",
+                                painter = if (quote.isSaved) painterResource(R.drawable.baseline_bookmark_24) else painterResource(
+                                    id = R.drawable.baseline_bookmark_border_24
+                                ),
+                                contentDescription = if (quote.isSaved) "Quote saved" else "Save quote",
                                 tint = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.size(32.dp)
                             )
@@ -151,7 +153,10 @@ fun QuoteOfTheDayCardNew(
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .background(MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(20.dp))
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant,
+                        shape = RoundedCornerShape(20.dp)
+                    )
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Text(
@@ -184,7 +189,7 @@ fun QuoteOfTheDayCardNew(
 private fun QuoteCardPreview() {
     MotifyTheme {
         Surface {
-            QuoteOfTheDayCardNew(
+            QuoteOfTheDayCard(
                 quote = Quote(
                     "Believe in yourself and all that you are. Know that there is something inside you that is greater than any obstacle.",
                     "Unknown"

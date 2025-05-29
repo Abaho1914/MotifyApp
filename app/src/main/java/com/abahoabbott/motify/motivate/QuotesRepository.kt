@@ -5,9 +5,8 @@ import com.abahoabbott.motify.room.QuoteDao
 import com.abahoabbott.motify.room.QuoteEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import timber.log.Timber
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 /**
@@ -20,18 +19,17 @@ class QuotesRepository @Inject constructor(
     private val quoteDao: QuoteDao
 ) {
 
-    private fun todayDate(): String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-
     fun getTodayQuote(): Flow<Quote?> {
-        return quoteDao.getQuoteByDate(todayDate()).map { it?.toQuote() }
+        val today = LocalDateTime.now().toLocalDate().toString()
+        Timber.i("Time used to retrieve quote from db $today")
+        return quoteDao.getQuoteByDate(today).map { it?.toQuote() }
     }
 
-
-    private fun currentTimestamp(): String =
-        SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-
     suspend fun saveQuoteOfTheDay(quote: Quote) {
-        val entity = QuoteEntity(timestamp = currentTimestamp(), text = quote.text, author = quote.author)
+        val today = LocalDateTime.now().toLocalDate().toString()
+        Timber.i("Time used save quote to db $today")
+        val entity = QuoteEntity(date = today, text = quote.text, author = quote.author)
+        Timber.i("Saved $entity to database")
         quoteDao.insertQuote(entity)
     }
 
@@ -39,9 +37,16 @@ class QuotesRepository @Inject constructor(
         return quoteDao.getAllQuotes().map { list -> list.map { it.toQuote() } }
     }
 
+    fun updateQuote(quote: Quote){
+      //  val quoteEntity  = quote.toQuoteEntity()
+        Timber.d("Updating quote: $quote")
+
+    }
 
 
-    private fun QuoteEntity.toQuote(): Quote = Quote(text, author, isBookmarked)
+
+    private fun QuoteEntity.toQuote(): Quote = Quote(text, author, date,isSaved = isBookmarked)
 
 
 }
+

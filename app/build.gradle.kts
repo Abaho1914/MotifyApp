@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.room)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -104,5 +105,9 @@ dependencies {
     androidTestImplementation(libs.androidx.work.testing)
     implementation(libs.timber)
     testImplementation(kotlin("test"))
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation (libs.firebase.firestore.ktx)
 
 }

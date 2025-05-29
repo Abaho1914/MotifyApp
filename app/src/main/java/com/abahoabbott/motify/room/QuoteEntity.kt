@@ -8,7 +8,7 @@ import java.util.UUID
 data class QuoteEntity(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val timestamp: String, // Format: "yyyy-MM-dd HH:mm:ss"
+    val date: String, // Format: "yyyy-MM-dd HH:mm:ss"
     val text: String,
     val author: String,
     val isBookmarked: Boolean = false

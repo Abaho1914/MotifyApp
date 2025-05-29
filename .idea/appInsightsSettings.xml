@@ -9,10 +9,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.abahoabbott.motify" />
+                  <option name="mobileSdkAppId" value="1:884743840539:android:e3b577ee209868c7fc29be" />
+                  <option name="projectId" value="motify-e12f3" />
+                  <option name="projectNumber" value="884743840539" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
