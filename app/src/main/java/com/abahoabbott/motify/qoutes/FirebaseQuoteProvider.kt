@@ -2,6 +2,7 @@ package com.abahoabbott.motify.qoutes
 
 import com.abahoabbott.motify.data.Quote
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import java.time.LocalDate
@@ -9,37 +10,48 @@ import java.time.LocalDate
 /**
  * FirebaseQuoteProvider fetches a daily motivational quote from Firebase Firestore.
  * It uses the current date as the document ID to retrieve the quote.
- *
- * If the quote is not found or the request fails, a default quote is returned.
- *
- * @property firestore The Firestore instance used to retrieve quotes.
+ * Falls back to the latest quote if the current date is missing.
  */
 class FirebaseQuoteProvider(
     private val firestore: FirebaseFirestore
 ) : QuoteProvider {
 
-
     /**
      * Retrieves the motivational quote of the day.
+     * If not found, returns the most recent fallback or a default quote.
      *
-     * @param date Optional parameter to specify the date for which to fetch the quote.
-     *             Defaults to the current date. Useful for testing.
+     * @param date The date to fetch the quote for (defaults to today).
      * @return A [Quote] object containing the quote text and author.
      */
-    override suspend fun getDailyQuote(date: LocalDate): Quote {   return try {
-        val snapshot = firestore.collection(QUOTES_COLLECTION)
-            .document(date.toString())
-            .get()
-            .await()
+    override suspend fun getDailyQuote(date: LocalDate): Quote {
+        return try {
+            val docRef = firestore.collection(QUOTES_COLLECTION)
+                .document(date.toString())
+                .get()
+                .await()
 
-        val text = snapshot.getString("text") ?: DEFAULT_QUOTE
-        val author = snapshot.getString("author") ?: DEFAULT_AUTHOR
+            if (docRef.exists()) {
+                val text = docRef.getString("text") ?: DEFAULT_QUOTE
+                val author = docRef.getString("author") ?: DEFAULT_AUTHOR
+                Quote(text, author)
+            } else {
+                // Fallback to latest available quote
+                val fallback = firestore.collection(QUOTES_COLLECTION)
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
+                    .limit(1)
+                    .get()
+                    .await()
+                    .documents
+                    .firstOrNull()
 
-        Quote(text, author)
-    } catch (e: Exception) {
-        Timber.e( "Failed to fetch quote: ${e.message}")
-        Quote(DEFAULT_QUOTE, DEFAULT_AUTHOR)
-    }
+                val fallbackText = fallback?.getString("text") ?: DEFAULT_QUOTE
+                val fallbackAuthor = fallback?.getString("author") ?: DEFAULT_AUTHOR
+                Quote(fallbackText, fallbackAuthor)
+            }
+        } catch (e: Exception) {
+            Timber.e("Failed to fetch quote: ${e.message}")
+            Quote(DEFAULT_QUOTE, DEFAULT_AUTHOR)
+        }
     }
 
     companion object {

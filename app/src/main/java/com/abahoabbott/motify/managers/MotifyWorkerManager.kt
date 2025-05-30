@@ -91,7 +91,7 @@ class WorkSchedulerManager @Inject constructor(
     }
     private fun getRepeatInterval(): Pair<Long, TimeUnit> {
         return if (isDebugMode) {
-            15L to TimeUnit.MINUTES
+            30L to TimeUnit.MINUTES
         } else {
             24L to TimeUnit.HOURS
         }

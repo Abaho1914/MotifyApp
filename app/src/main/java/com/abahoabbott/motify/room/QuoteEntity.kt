@@ -6,9 +6,9 @@ import java.util.UUID
 
 @Entity("QuotesTable")
 data class QuoteEntity(
-    @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val date: String, // Format: "yyyy-MM-dd HH:mm:ss"
+    @PrimaryKey
+    val date: String,
     val text: String,
     val author: String,
     val isBookmarked: Boolean = false
