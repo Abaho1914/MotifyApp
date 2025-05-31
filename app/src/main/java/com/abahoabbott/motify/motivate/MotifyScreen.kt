@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+//import androidx.compose.material3.rememberSnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -80,6 +83,7 @@ private fun MotifyScreenContents(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val notificationManager = remember { NotificationManagerHelper(context) }
+    val snackbarHostState  = remember { SnackbarHostState() }
 
 // Permission state
     val hasNotificationPermission by remember {
@@ -109,7 +113,14 @@ private fun MotifyScreenContents(
         ) {
             QuoteOfTheDayCard(
                 quote = currentQuote,
-                onSaveClick = {onSaveQuote(it)},
+                onSaveClick = {
+                    onSaveQuote(it)
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            if (it.isSaved) "Removed from bookmarks" else "Saved to bookmarks"
+                        )
+                    }
+                },
                 onShareClick = {}
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -134,9 +145,7 @@ private fun MotifyScreenContents(
             )
 
         }
-        // Show permission request notice if needed
-
-
+        SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
@@ -171,7 +180,7 @@ private fun sendReminderNotification(
     scope.launch {
         notificationManager.showMotivationNotification(
             "Daily Motivation",
-            quote = quote.toString()
+            quote
         )
     }
 }
@@ -211,6 +220,7 @@ private fun MotifyScreenContentsPreview() {
         Surface {
             MotifyScreenContents(
                 currentQuote = Quote(
+                    id="",
                     "Believe you can and you're halfway there.",
                     "Theodore Roosevelt"
                 )

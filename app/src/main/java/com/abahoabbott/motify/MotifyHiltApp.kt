@@ -36,6 +36,7 @@ class MotifyHiltApp : Application(), Configuration.Provider {
 
         // Initialize Timber for logging
         if (BuildConfig.DEBUG) {
+            workSchedulerManager.triggerImmediateMotivationWork()
             Timber.plant(Timber.DebugTree())
         }
 

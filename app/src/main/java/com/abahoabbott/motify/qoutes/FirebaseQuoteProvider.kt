@@ -33,7 +33,7 @@ class FirebaseQuoteProvider(
             if (docRef.exists()) {
                 val text = docRef.getString("text") ?: DEFAULT_QUOTE
                 val author = docRef.getString("author") ?: DEFAULT_AUTHOR
-                Quote(text, author)
+                Quote(text = text, author=author)
             } else {
                 // Fallback to latest available quote
                 val fallback = firestore.collection(QUOTES_COLLECTION)
@@ -46,11 +46,11 @@ class FirebaseQuoteProvider(
 
                 val fallbackText = fallback?.getString("text") ?: DEFAULT_QUOTE
                 val fallbackAuthor = fallback?.getString("author") ?: DEFAULT_AUTHOR
-                Quote(fallbackText, fallbackAuthor)
+                Quote(text = fallbackText, author = fallbackAuthor)
             }
         } catch (e: Exception) {
             Timber.e("Failed to fetch quote: ${e.message}")
-            Quote(DEFAULT_QUOTE, DEFAULT_AUTHOR)
+            Quote(author = DEFAULT_AUTHOR, text = DEFAULT_QUOTE)
         }
     }
 

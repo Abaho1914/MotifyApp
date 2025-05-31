@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import java.util.UUID
+import java.time.LocalDateTime
 
 
 @HiltViewModel
@@ -81,7 +83,12 @@ class MotifyViewModel @Inject constructor(
         val parts = quoteString.split(" - ", limit = 2)
         val text = parts.getOrNull(0)?.trim() ?: ""
         val author = parts.getOrNull(1)?.trim() ?: "Unknown"
-        return Quote(text, author)
+        return Quote(
+            id = UUID.randomUUID().toString(),
+            text = text,
+            author = author,
+            date = LocalDateTime.now().toLocalDate().toString()
+        )
     }
 
 }

@@ -6,10 +6,12 @@ import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.abahoabbott.motify.MainActivity
 import com.abahoabbott.motify.R
+import com.abahoabbott.motify.data.Quote
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -28,7 +30,7 @@ class NotificationManagerHelper(private val context: Context) {
      */
     suspend fun showMotivationNotification(
         title: String,
-        quote: String
+        quote: Quote
     ): Result<Int> = withContext(Dispatchers.IO)
     {
         try {
@@ -38,11 +40,15 @@ class NotificationManagerHelper(private val context: Context) {
             //Create a Pending Intent that carries the quote extras
             val pendingIntent = createMainActivityPendingIntent(quote)
 
+            val bigText = "\"${quote.text}\"\n— ${quote.author}"
             val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle(title)
-                .setContentText(quote)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(quote))
+                .setSmallIcon(R.drawable.ic_notification_motivation)
+                .setContentTitle("Today's Quote")
+                .setContentText(quote.text)
+                .setStyle(NotificationCompat.BigTextStyle()
+                    .bigText(bigText)
+                    .setSummaryText("Tap to open Motify"))
+                .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.drawable.ic_notification_motivation))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
@@ -62,10 +68,10 @@ class NotificationManagerHelper(private val context: Context) {
     /**
      * Creates a PendingIntent that opens MainActivity
      */
-    private fun createMainActivityPendingIntent(quote: String): PendingIntent {
+    private fun createMainActivityPendingIntent(quote: Quote): PendingIntent {
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("QUOTE_FROM_NOTIFICATION", quote)
+            putExtra("QUOTE_FROM_NOTIFICATION", quote.toString())
         }
 
         return TaskStackBuilder.create(context).run {

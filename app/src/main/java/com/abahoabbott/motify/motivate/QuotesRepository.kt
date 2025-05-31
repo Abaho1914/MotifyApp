@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import java.time.LocalDateTime
 import javax.inject.Inject
+import java.util.UUID
 
 /**
  * Repository class for managing motivational quotes.
@@ -37,16 +38,20 @@ class QuotesRepository @Inject constructor(
         return quoteDao.getAllQuotes().map { list -> list.map { it.toQuote() } }
     }
 
-    fun updateQuote(quote: Quote){
-      //  val quoteEntity  = quote.toQuoteEntity()
+   suspend fun updateQuote(quote: Quote) {
         Timber.d("Updating quote: $quote")
-
+        val entity = QuoteEntity(
+            id = quote.id,
+            date = quote.date,
+            text = quote.text,
+            author = quote.author,
+            isBookmarked = quote.isSaved
+        )
+        quoteDao.updateQuote(entity)
     }
 
-
-
-    private fun QuoteEntity.toQuote(): Quote = Quote(text, author, date,isSaved = isBookmarked)
-
+    private fun QuoteEntity.toQuote(): Quote = Quote( id = id,text = text, author = author, date =date,isSaved = isBookmarked)
 
 }
+
 

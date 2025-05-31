@@ -53,6 +53,7 @@ androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+material3 = { module = "androidx.compose.material3:material3" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomCompiler" }
