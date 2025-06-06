@@ -30,7 +30,9 @@ class GeminiService @Inject constructor() {
                 4. Return ONLY the quote and author in the specified format
             """.trimIndent()
 
-            val response = model.generateContent(content(prompt))
+            Timber.d("Generating quote with Gemini")
+
+            val response = model.generateContent(prompt)
             val quoteText = response.text ?: throw Exception("No response from Gemini")
             
             // Parse the response
