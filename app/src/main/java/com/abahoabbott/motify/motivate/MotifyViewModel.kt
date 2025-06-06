@@ -15,7 +15,6 @@ import javax.inject.Inject
 import java.util.UUID
 import java.time.LocalDateTime
 
-
 @HiltViewModel
 class MotifyViewModel @Inject constructor(
     private val quotesRepository: QuotesRepository
@@ -24,56 +23,65 @@ class MotifyViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<MotifyUiState>(Loading)
     val uiState: StateFlow<MotifyUiState> = _uiState.asStateFlow()
 
-
     init {
         fetchInitialQuote()
     }
 
     private fun fetchInitialQuote() {
-
         viewModelScope.launch {
             _uiState.value = Loading
             try {
-                quotesRepository.getTodayQuote().collect {
-
-                    quote->
-                    if (quote == null){
-                        _uiState.value = Error("No quote found")
-                    } else
-                    {
+                quotesRepository.getTodayQuote().collect { quote ->
+                    if (quote == null) {
+                        // If no quote exists for today, generate a new one
+                        generateNewQuote()
+                    } else {
                         _uiState.value = Success(quote)
                     }
                 }
-
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 _uiState.value = Error(e.message.toString())
             }
-
         }
-
     }
 
-    // Function to get the next quote
     fun getNextQuote() {
+        viewModelScope.launch {
+            _uiState.value = Loading
+            generateNewQuote()
+        }
+    }
 
-       }
+    private suspend fun generateNewQuote() {
+        try {
+            quotesRepository.generateNewQuote()
+                .onSuccess { quote ->
+                    _uiState.value = Success(quote)
+                }
+                .onFailure { error ->
+                    _uiState.value = Error(error.message ?: "Failed to generate quote")
+                }
+        } catch (e: Exception) {
+            _uiState.value = Error(e.message ?: "Failed to generate quote")
+        }
+    }
 
     fun overrideQuoteFromNotification(quote: String) {
-        _uiState.value = Success( stringToQuote(quote))
+        _uiState.value = Success(stringToQuote(quote))
         Timber.i("Quote overridden from notification: $quote")
     }
 
-    fun toggleFavorite(quote: Quote){
+    fun toggleFavorite(quote: Quote) {
         viewModelScope.launch {
             try {
                 val updatedQuote = quote.copy(
                     isSaved = !quote.isSaved
                 )
                 quotesRepository.updateQuote(updatedQuote)
-              if (_uiState.value is Success && (uiState.value as Success).quote == quote){
-                  _uiState.value = Success(updatedQuote)
-              }
-            } catch (e:Exception){
+                if (_uiState.value is Success && (_uiState.value as Success).quote == quote) {
+                    _uiState.value = Success(updatedQuote)
+                }
+            } catch (e: Exception) {
                 Timber.e(e, "Error toggling favorite state for quote: ${quote.text}")
             }
         }
@@ -90,6 +98,5 @@ class MotifyViewModel @Inject constructor(
             date = LocalDateTime.now().toLocalDate().toString()
         )
     }
-
 }
 
