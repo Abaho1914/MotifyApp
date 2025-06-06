@@ -24,10 +24,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-
         val properties = Properties()
         properties.load(project.rootProject.file("local.properties").inputStream())
         buildConfigField("String", "WORDNIK_API_KEY", properties.getProperty("WORDNIK_API_KEY"))
+        buildConfigField("String", "GEMINI_API_KEY", properties.getProperty("GEMINI_API_KEY"))
     }
 
     buildTypes {
@@ -112,4 +112,6 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation (libs.firebase.firestore.ktx)
 
+    // Gemini
+    implementation("com.google.ai.client.generativeai:generativeai:0.2.1")
 }
