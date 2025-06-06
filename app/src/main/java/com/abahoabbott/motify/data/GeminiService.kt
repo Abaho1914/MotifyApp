@@ -1,5 +1,6 @@
 package com.abahoabbott.motify.data
 
+import com.abahoabbott.motify.BuildConfig
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.GenerateContentResponse
 import com.google.ai.client.generativeai.type.content
