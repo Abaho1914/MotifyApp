@@ -11,5 +11,6 @@ import java.time.LocalDate
 interface QuoteProvider {
 
    suspend  fun getDailyQuote(date: LocalDate): Quote
+   suspend fun generateNewQuote(): Result<Quote>
 }
 
