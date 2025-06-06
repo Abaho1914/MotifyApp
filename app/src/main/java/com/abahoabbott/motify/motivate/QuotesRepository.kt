@@ -1,5 +1,6 @@
 package com.abahoabbott.motify.motivate
 
+import com.abahoabbott.motify.data.GeminiService
 import com.abahoabbott.motify.data.Quote
 import com.abahoabbott.motify.room.QuoteDao
 import com.abahoabbott.motify.room.QuoteEntity
@@ -17,7 +18,8 @@ import java.util.UUID
  * @constructor The class is annotated with @Inject for easy dependency injection using frameworks like Dagger or Hilt.
  */
 class QuotesRepository @Inject constructor(
-    private val quoteDao: QuoteDao
+    private val quoteDao: QuoteDao,
+    private val geminiService: GeminiService
 ) {
 
     fun getTodayQuote(): Flow<Quote?> {
@@ -34,11 +36,24 @@ class QuotesRepository @Inject constructor(
         quoteDao.insertQuote(entity)
     }
 
+    suspend fun generateNewQuote(): Result<Quote> {
+        return try {
+            val result = geminiService.generateQuote()
+            result.onSuccess { quote ->
+                saveQuoteOfTheDay(quote)
+            }
+            result
+        } catch (e: Exception) {
+            Timber.e(e, "Error generating new quote")
+            Result.failure(e)
+        }
+    }
+
     fun getAllSavedQuotes(): Flow<List<Quote>> {
         return quoteDao.getAllQuotes().map { list -> list.map { it.toQuote() } }
     }
 
-   suspend fun updateQuote(quote: Quote) {
+    suspend fun updateQuote(quote: Quote) {
         Timber.d("Updating quote: $quote")
         val entity = QuoteEntity(
             id = quote.id,
@@ -50,7 +65,13 @@ class QuotesRepository @Inject constructor(
         quoteDao.updateQuote(entity)
     }
 
-    private fun QuoteEntity.toQuote(): Quote = Quote( id = id,text = text, author = author, date =date,isSaved = isBookmarked)
+    private fun QuoteEntity.toQuote(): Quote = Quote(
+        id = id,
+        text = text,
+        author = author,
+        date = date,
+        isSaved = isBookmarked
+    )
 
 }
 
