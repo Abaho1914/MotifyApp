@@ -11,9 +11,11 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.abahoabbott.motify.MainActivity
 import com.abahoabbott.motify.R
+import com.abahoabbott.motify.analytics.AnalyticsManager
 import com.abahoabbott.motify.data.Quote
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 // Constants for notification channel
 const val CHANNEL_ID = "motify_channel_id"
@@ -23,7 +25,10 @@ const val CHANNEL_DESCRIPTION = "Motivation notifications from Motify"
 /**
  * Centralized manager for all notification-related operations
  */
-class NotificationManagerHelper(private val context: Context) {
+class NotificationManagerHelper @Inject constructor(
+    private val context: Context,
+    private val analyticsManager: AnalyticsManager
+) {
 
     /**
      * Shows a motivation notification with the given title and message
@@ -38,7 +43,7 @@ class NotificationManagerHelper(private val context: Context) {
             val notificationManager = NotificationManagerCompat.from(context)
 
             //Create a Pending Intent that carries the quote extras
-            val pendingIntent = createMainActivityPendingIntent(quote)
+            val pendingIntent = createMainActivityPendingIntent(quote, notificationId)
 
             val bigText = "\"${quote.text}\"\n— ${quote.author}"
             val notification = NotificationCompat.Builder(context, CHANNEL_ID)
@@ -55,6 +60,10 @@ class NotificationManagerHelper(private val context: Context) {
                 .build()
 
             notificationManager.notify(notificationId, notification)
+            
+            // Log notification sent event
+            analyticsManager.logNotificationReceived(notificationId)
+            
             Result.success(notificationId)
         } catch (e: SecurityException) {
             // Handle missing notification permission
@@ -68,21 +77,22 @@ class NotificationManagerHelper(private val context: Context) {
     /**
      * Creates a PendingIntent that opens MainActivity
      */
-    private fun createMainActivityPendingIntent(quote: Quote): PendingIntent {
+    private fun createMainActivityPendingIntent(quote: Quote, notificationId: Int): PendingIntent {
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("QUOTE_FROM_NOTIFICATION", quote.toString())
         }
 
+        val flags =
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+
         return TaskStackBuilder.create(context).run {
             addNextIntentWithParentStack(intent)
-
-            // Use the appropriate flags based on Android version
-            val flags =
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-
-            getPendingIntent(0, flags)
+            val pendingIntent = getPendingIntent(0, flags)
                 ?: throw IllegalStateException("Failed to create PendingIntent")
+            // Log notification clicked event
+            analyticsManager.logNotificationClicked(notificationId)
+            pendingIntent
         }
     }
 
