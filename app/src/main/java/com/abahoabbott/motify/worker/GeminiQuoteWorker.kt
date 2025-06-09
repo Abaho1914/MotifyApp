@@ -35,7 +35,7 @@ class GeminiQuoteWorker @AssistedInject constructor(
         return withContext(Dispatchers.IO) {
             try {
                 Timber.i("Running Gemini Worker")
-                val serviceResult = geminiService.generateQuote()
+                val serviceResult = geminiService.generateQuote(isTesting = false)
 
                 serviceResult.fold(
                     onSuccess = { quote ->
@@ -51,7 +51,7 @@ class GeminiQuoteWorker @AssistedInject constructor(
                         )
 
                         geminiQuotesRepository.saveQuoteOfTheDay(quote)
-                        Timber.i("Gemini Worker Succeded")
+                        Timber.i("Gemini Worker Succeeded")
                         Result.success()
 
                     },
