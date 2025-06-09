@@ -7,6 +7,8 @@ import com.abahoabbott.motify.analytics.AnalyticsManager
 import com.abahoabbott.motify.notify.NotificationManagerHelper
 import com.abahoabbott.motify.qoutes.FirebaseQuoteProvider
 import com.abahoabbott.motify.qoutes.QuoteProvider
+import com.abahoabbott.motify.repository.GeminiQuotesRepository
+import com.abahoabbott.motify.room.QuoteDao
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.firestore.FirebaseFirestore
@@ -46,13 +48,19 @@ object WorkerModule {
 
     @Singleton
     @Provides
+    fun providesGeminiQuotesRepository(quoteDao: QuoteDao): GeminiQuotesRepository {
+        return GeminiQuotesRepository(quoteDao)
+    }
+
+    @Singleton
+    @Provides
     fun provideQuoteProvider(firestore: FirebaseFirestore): QuoteProvider {
         return FirebaseQuoteProvider(firestore)
     }
 
     @Provides
     @Singleton
-    fun provideFirebaseAnalytics(@ApplicationContext context: Context): FirebaseAnalytics {
+    fun provideFirebaseAnalytics(): FirebaseAnalytics {
         return Firebase.analytics
     }
 
