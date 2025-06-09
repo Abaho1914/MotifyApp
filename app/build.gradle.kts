@@ -32,10 +32,13 @@ android {
 
     buildTypes {
         debug {
+            //Small chnage
             buildConfigField("boolean", "DEBUG", "true")
+            buildConfigField("boolean", "USE_FAKE_QUOTES", "true")
         }
         release {
             buildConfigField("boolean", "DEBUG", "false")
+            buildConfigField("boolean", "USE_FAKE_QUOTES", "false")
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
