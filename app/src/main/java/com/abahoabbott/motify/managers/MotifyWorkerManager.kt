@@ -3,14 +3,12 @@ package com.abahoabbott.motify.managers
 
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.Operation
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.abahoabbott.motify.BuildConfig
-import com.abahoabbott.motify.worker.MotifyWorker
+import com.abahoabbott.motify.worker.GeminiQuoteWorker
 import timber.log.Timber
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -26,12 +24,20 @@ class WorkSchedulerManager @Inject constructor(
 ) {
     companion object {
         const val DAILY_WORK_NAME = "daily_motivation_work"
-        const val IMMEDIATE_WORK_NAME = "immediate_motivation_work"
-        const val IMMEDIATE_WORK_TAG = "immediate_motivation"
         const val PERIODIC_WORK_TAG = "motivation_notification"
 
         //For testing and debugging purposes
         private val isDebugMode get() = BuildConfig.DEBUG
+
+    }
+
+    fun fetchQuoteOfTheDay(){
+        Timber.i("Fetching Quote of the day")
+        //Create WorkRequest
+        val workRequest = OneTimeWorkRequestBuilder<GeminiQuoteWorker>()
+        //Start the work
+        Timber.i("Starting gemini work")
+        workManager.enqueue(workRequest.build())
 
     }
 
@@ -51,7 +57,6 @@ class WorkSchedulerManager @Inject constructor(
             val initialDelay = calculateInitialDelayUntilNextNotification()
 
             // Create work request with appropriate interval based on build type
-
             val (repeatInterval, timeUnit) = getRepeatInterval()
 
             val dailyWorkRequest = createDailyWorkRequest(initialDelay, repeatInterval, timeUnit)
@@ -72,30 +77,16 @@ class WorkSchedulerManager @Inject constructor(
         }
     }
 
-    /**
-     * Trigger a one-time motivation work request for immediate execution
-     * Useful for testing
-     */
-    fun triggerImmediateMotivationWork(): Operation {
-        Timber.d("Triggering immediate motivation work")
-
-        val oneTimeWork = OneTimeWorkRequestBuilder<MotifyWorker>()
-            .addTag(IMMEDIATE_WORK_TAG)
-            .build()
-
-        return workManager.enqueueUniqueWork(
-            IMMEDIATE_WORK_NAME,
-            ExistingWorkPolicy.REPLACE,
-            oneTimeWork
-        )
-    }
     private fun getRepeatInterval(): Pair<Long, TimeUnit> {
         return if (isDebugMode) {
-            30L to TimeUnit.MINUTES
+            60L to TimeUnit.MINUTES
         } else {
             24L to TimeUnit.HOURS
         }
     }
+
+
+
 
 
     /**
@@ -119,7 +110,7 @@ class WorkSchedulerManager @Inject constructor(
             .build()
 
         // Build the work request
-        return PeriodicWorkRequestBuilder<MotifyWorker>(repeatInterval, timeUnit)
+        return PeriodicWorkRequestBuilder<GeminiQuoteWorker>(repeatInterval, timeUnit)
             .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
             .setConstraints(constraints)
             .addTag(PERIODIC_WORK_TAG)
@@ -175,11 +166,5 @@ class WorkSchedulerManager @Inject constructor(
                 }
             }
     }
-
-    /**
-     * Get the WorkInfo for the daily motivation work as LiveData
-     */
-    fun getDailyMotivationWorkInfo() =
-        workManager.getWorkInfosForUniqueWorkLiveData(DAILY_WORK_NAME)
 
 }
