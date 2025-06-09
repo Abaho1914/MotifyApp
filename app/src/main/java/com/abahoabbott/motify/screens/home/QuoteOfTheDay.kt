@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -53,8 +54,6 @@ import com.abahoabbott.motify.ui.theme.MotifyTheme
 @Composable
 fun QuoteOfTheDayCard(
     quote: Quote,
-    onSaveClick: (quote: Quote) -> Unit,
-    onShareClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val playfairDisplay = FontFamily(Font(R.font.playfair_display))
@@ -66,120 +65,47 @@ fun QuoteOfTheDayCard(
             .semantics { contentDescription = "Quote of the day" },
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Box(modifier = Modifier.padding(24.dp)) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Top-left quote icon
-                Icon(
-                    painter = painterResource(id = R.drawable.format_quote_24px),
-                    contentDescription = "Opening quote icon",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .rotate(180f)
-                )
 
                 // Quote text
                 Text(
-                    text = quote.text,
+                    text ="\" ${quote.text} \"",
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontFamily = playfairDisplay,
-                        fontStyle = FontStyle.Italic,
+                        fontStyle = FontStyle.Normal,
                         textAlign = TextAlign.Center,
-                        fontSize = 18.sp,
-                        lineHeight = 28.sp
+                        fontSize = 22.sp,
+                        lineHeight = 32.sp
                     ),
-                    maxLines = 5,
-                    overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 // Author
                 Text(
-                    text = quote.author.uppercase(),
+                    text = "- ${quote.author}",
                     style = MaterialTheme.typography.labelLarge.copy(
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         fontFamily = playfairDisplay
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        .padding(top = 16.dp),
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center
                 )
-
-                // Footer actions
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = { onSaveClick(quote) }) {
-                            Icon(
-                                painter = if (quote.isSaved) painterResource(R.drawable.baseline_bookmark_24) else painterResource(
-                                    id = R.drawable.baseline_bookmark_border_24
-                                ),
-                                contentDescription = if (quote.isSaved) "Quote saved" else "Save quote",
-                                tint = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                    }
-
-                    IconButton(onClick = onShareClick) {
-                        Icon(
-                            imageVector = Icons.Filled.Share,
-                            contentDescription = "Share",
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                }
             }
-
-            // Top-right label
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .background(
-                        MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(20.dp)
-                    )
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
-            ) {
-                Text(
-                    text = "Today's quote",
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    ),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-
-            // Bottom-right quote icon above the share icon
-            Icon(
-                painter = painterResource(id = R.drawable.format_quote_24px),
-                contentDescription = "Closing quote icon",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 56.dp) // Adjust distance above share icon
-                    .size(32.dp)
-
-            )
         }
     }
 }
@@ -191,12 +117,10 @@ private fun QuoteCardPreview() {
         Surface {
             QuoteOfTheDayCard(
                 quote = Quote(
-                    id="",
-                    "Believe in yourself and all that you are. Know that there is something inside you that is greater than any obstacle.",
-                    "Unknown"
-                ),
-                onSaveClick = {},
-                onShareClick = {}
+                    id = "",
+                    "The only way to do great work is to love what you do. If you haven\'t found it yet, keep looking. Don\'t settle.",
+                    "Steve Jobs"
+                )
             )
         }
     }
