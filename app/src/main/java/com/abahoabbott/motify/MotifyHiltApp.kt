@@ -36,7 +36,8 @@ class MotifyHiltApp : Application(), Configuration.Provider {
 
         // Initialize Timber for logging
         if (BuildConfig.DEBUG) {
-            workSchedulerManager.triggerImmediateMotivationWork()
+            workSchedulerManager.fetchQuoteOfTheDay()
+            Timber.i("Hilt App Code running")
             Timber.plant(Timber.DebugTree())
         }
 
@@ -47,6 +48,7 @@ class MotifyHiltApp : Application(), Configuration.Provider {
 
         // Schedule daily motivation work
         workSchedulerManager.scheduleDailyMotivationWork()
+
     }
 
 
