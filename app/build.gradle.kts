@@ -32,11 +32,14 @@ android {
 
     buildTypes {
         debug {
-            //Small chnage
+            //Small change
+            isDebuggable =true
             buildConfigField("boolean", "DEBUG", "true")
             buildConfigField("boolean", "USE_FAKE_QUOTES", "true")
         }
         release {
+            isShrinkResources = true
+            isDebuggable = false
             buildConfigField("boolean", "DEBUG", "false")
             buildConfigField("boolean", "USE_FAKE_QUOTES", "false")
             isMinifyEnabled = true
@@ -116,5 +119,5 @@ dependencies {
     implementation (libs.firebase.firestore.ktx)
 
     // Gemini
-    implementation("com.google.ai.client.generativeai:generativeai:0.2.1")
+    implementation(libs.generativeai)
 }
